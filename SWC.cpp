@@ -1,7 +1,9 @@
-#include <Windows.h>
+#include <fstream>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
+#include <Windows.h>
+
 
 // Global Members
 
@@ -17,6 +19,13 @@ static HINSTANCE hInst;
 // Window-Procedure callback function
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
+// HTML file content
+std::string	fileContent;
+
+// Function to read local html file
+bool ReadHTMLFile(const std::string&);
+
+// Entry Point
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 
@@ -47,11 +56,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		500, 100, NULL, NULL, hInstance, NULL);
 	if (!hWnd)
 	{
-		MessageBox(NULL, _T("Call yo CreateWindowEx failed!"), _T("SimpleWebClient says"), NULL);
+		MessageBox(NULL, _T("Call to CreateWindowEx failed!"), _T("SimpleWebClient says"), NULL);
 		return 1;
 	}
 
-	ShowWindow(hWnd, nCmdShow);
+	ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 	UpdateWindow(hWnd);
 
 	MSG msg;
@@ -72,9 +81,17 @@ LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+	case WM_CREATE:
+
+		if (!ReadHTMLFile("C:\\Users\\PRAATLE\\selfLearning\\SWC\\index.html"))
+		{
+			MessageBox(NULL, _T("Failed to open file"), _T("SimpleWebClient says"), NULL);
+			break;
+		}
+		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		TextOut(hdc, 5, 5, greeting, _tcslen(greeting));
+		TextOut(hdc, 5, 5, std::wstring(fileContent.begin(), fileContent.end()).c_str(), _tcslen(std::wstring(fileContent.begin(), fileContent.end()).c_str()));
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
@@ -86,4 +103,25 @@ LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0;
+}
+
+bool ReadHTMLFile(const std::string& fileName)
+{
+	std::ifstream file(fileName);
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	file >> fileContent;
+
+	std::string line;
+
+	while (file >> line)
+	{
+		fileContent += line;
+		fileContent.push_back('\n');
+	}
+
+	return true;
 }
