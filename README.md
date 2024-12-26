@@ -17,5 +17,6 @@ This steps are to make sure we are going in correct way. Each step will be sub d
 Below we'll keep track of steps we've completed/implemented so far and also next step.
 1. Developed a simple windows GUI application which display's some text.
 2. File handling to load a HTML file.
+3. Create a simple web socket client.
 
 Thanks
